@@ -49,11 +49,12 @@ public class Window
 
         float[] vertices =
         {
+            // aPosition        | aTexCords
             // X Y Z
-            0.5f, 0.5f, 0.0f,
-            0.5f, -0.5f, 0.0f,
-            -0.5f, -0.5f, 0.0f,
-            -0.5f, 0.5f, 0.0f,
+            0.5f, 0.5f, 0.0f,   1.0f, 1.0f,
+            0.5f, -0.5f, 0.0f,  1.0f, 0.0f,
+            -0.5f, -0.5f, 0.0f, 0.0f, 0.0f,
+            -0.5f, 0.5f, 0.0f,  0.0f, 1.0f
         };
 
         _vbo = _gl.GenBuffer();
@@ -77,20 +78,29 @@ public class Window
         const string vertexCode = @"
             #version 330 core
 
+            // First 3 values
             layout (location = 0) in vec3 aPosition;
 
+            // Second 2 values
+            layout (location = 1) in vec2 aTextureCoord;
+
+            // Stores and outputs the data we want to the fragment shader
+            out vec2 frag_textCoords;
             void main()
             {
                 gl_Position = vec4(aPosition, 1.0);
+                frag_textCoords = aTextureCoord;
             }";
 
         const string fragmentCode = @"
             #version 330 core
+            
+            in vec2 frag_textCoords;
 
             out vec4 out_color;
 
             void main() {
-                out_color = vec4(1.0, 0.5, 0.2, 1.0);
+                out_color = vec4(frag_textCoords.x, frag_textCoords.y, 0.0, 1.0);
             }
         ";
 
@@ -127,7 +137,12 @@ public class Window
 
         const uint positionLoc = 0; // Has to be same as aLocation in shader
         _gl.EnableVertexAttribArray(positionLoc);
-        _gl.VertexAttribPointer(positionLoc, 3, VertexAttribPointerType.Float, false, 3 * sizeof(float), (void*)0);
+        _gl.VertexAttribPointer(positionLoc, 3, VertexAttribPointerType.Float, false, 5 * sizeof(float), (void*)0);
+
+        const uint texCoordLoc = 1;
+        _gl.EnableVertexAttribArray(texCoordLoc);
+        // Change offset to read the last 2 values of the vertex
+        _gl.VertexAttribPointer(texCoordLoc, 2, VertexAttribPointerType.Float, false, 5 * sizeof(float), (void*)(3 * sizeof(float)));
 
         // Clean up
         _gl.BindVertexArray(0); // vertex array must be unbound first
