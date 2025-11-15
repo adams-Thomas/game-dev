@@ -18,6 +18,18 @@ public class Window
     private static uint _ebo; // Element Buffer Objects
     private static uint _program;
 
+    private static Vector3[] cubePositions = {
+    new Vector3( 0.0f,  0.0f,  0.0f),
+    new Vector3( 2.0f,  5.0f, -15.0f),
+    new Vector3(-1.5f, -2.2f, -2.5f),
+    new Vector3(-3.8f, -2.0f, -12.3f),
+    new Vector3( 2.4f, -0.4f, -3.5f),
+    new Vector3(-1.7f,  3.0f, -7.5f),
+    new Vector3( 1.3f, -2.0f, -2.5f),
+    new Vector3( 1.5f,  2.0f, -2.5f),
+    new Vector3( 1.5f,  0.2f, -1.5f),
+    new Vector3(-1.3f,  1.0f, -1.5f)
+        };
 
     public Window(int width, int height, string title)
     {
@@ -39,7 +51,7 @@ public class Window
 
     public static Vector3 Position { get; set; } = new Vector3(0, 0, 0);
     public static float Scale { get; set; } = 0.4f;
-    public static Quaternion Rotation { get; set; } = Quaternion.CreateFromAxisAngle(Vector3.UnitZ, (float) Glfw.GetApi().GetTime());
+    public static Quaternion Rotation { get; set; } = Quaternion.CreateFromAxisAngle(Vector3.UnitZ, (float)Glfw.GetApi().GetTime());
 
     private static unsafe void setInputs()
     {
@@ -48,6 +60,7 @@ public class Window
             input.Keyboards[i].KeyDown += KeyDown;
 
         _gl = _window.CreateOpenGL();
+
         _gl.ClearColor(Color.CornflowerBlue);
 
         _vao = _gl.GenVertexArray();
@@ -57,10 +70,51 @@ public class Window
         {
             // aPosition        | aTexCords
             // X Y Z
-            0.5f, 0.5f, 0.0f,   1.0f, 1.0f,
-            0.5f, -0.5f, 0.0f,  1.0f, 0.0f,
-            -0.5f, -0.5f, 0.0f, 0.0f, 0.0f,
-            -0.5f, 0.5f, 0.0f,  0.0f, 1.0f
+            // 0.5f, 0.5f, 0.0f,   1.0f, 1.0f,
+            // 0.5f, -0.5f, 0.0f,  1.0f, 0.0f,
+            // -0.5f, -0.5f, 0.0f, 0.0f, 0.0f,
+            // -0.5f, 0.5f, 0.0f,  0.0f, 1.0f
+            -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+     0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
+     0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+     0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+    -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+    -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+
+    -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+     0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+     0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+     0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+    -0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
+    -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+
+    -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+    -0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+    -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+    -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+    -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+    -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+
+     0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+     0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+     0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+     0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+     0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+     0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+
+    -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+     0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
+     0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+     0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+    -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+    -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+
+    -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+     0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+     0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+     0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+    -0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
+    -0.5f,  0.5f, -0.5f,  0.0f, 1.0f
         };
 
         _vbo = _gl.GenBuffer();
@@ -84,21 +138,19 @@ public class Window
         const string vertexCode = @"
             #version 330 core
 
-            // First 3 values
             layout (location = 0) in vec3 aPosition;
-
-            // Second 2 values
             layout (location = 1) in vec2 aTextureCoord;
 
-            uniform mat4 transform;
+            uniform mat4 model;
+            uniform mat4 view;
+            uniform mat4 projection;
 
             // Stores and outputs the data we want to the fragment shader
             out vec2 frag_textCoords;
 
-
             void main()
             {
-                gl_Position = transform * vec4(aPosition, 1.0);
+                gl_Position = projection * view * model * vec4(aPosition, 1.0);
                 frag_textCoords = aTextureCoord;
             }";
 
@@ -171,18 +223,48 @@ public class Window
 
     private static unsafe void setOnRender(double deltaTime)
     {
-        _gl.Clear(ClearBufferMask.ColorBufferBit);
+        _gl.Enable(EnableCap.DepthTest);
+        _gl.Clear((uint)(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit));
+
         _gl.BindVertexArray(_vao);
         _gl.UseProgram(_program);
 
-        Matrix4x4 transformation = Matrix4x4.Identity * Matrix4x4.CreateFromQuaternion(Rotation) * Matrix4x4.CreateScale(Scale) * Matrix4x4.CreateTranslation(Position);
-        // Matrix4x4 transformation = Matrix4x4.Identity * Matrix4x4.CreateFromQuaternion(
-        //     Quaternion.CreateFromAxisAngle(Vector3.UnitZ, (float) Glfw.GetApi().GetTime())
-        // );
+        var difference = (float)(Glfw.GetApi().GetTime() * 50);
 
-        int transformLoc = _gl.GetUniformLocation(_program, "transform");
-        // Console.WriteLine(transformLoc);
-        _gl.UniformMatrix4(transformLoc, 1, false, (float*) &transformation);
-        _gl.DrawElements(PrimitiveType.Triangles, 6, DrawElementsType.UnsignedInt, (void*)0);
+        Matrix4x4 view = Matrix4x4.Identity * Matrix4x4.CreateTranslation(0.0f, 0.0f, -3.0f);
+        int viewLoc = _gl.GetUniformLocation(_program, "view");
+        _gl.UniformMatrix4(viewLoc, 1, false, (float*)&view);
+
+        Matrix4x4 projection = Matrix4x4.CreatePerspectiveFieldOfView(
+            convertToRadians(45.0f), 800 / 600, 0.1f, 100.0f
+        );
+        int projectionLoc = _gl.GetUniformLocation(_program, "projection");
+        _gl.UniformMatrix4(projectionLoc, 1, false, (float*)&projection);
+
+        // _gl.DrawElements(PrimitiveType.Triangles, 6, DrawElementsType.UnsignedInt, (void*)0);
+
+        for (int i = 0; i < cubePositions.Length; i++)
+        {
+            Vector3 cube = cubePositions[i];
+            // Matrix4x4 model = ;
+            float angle = 20.0f * i;
+
+            Matrix4x4 model = Matrix4x4.Identity 
+                * Matrix4x4.CreateRotationY(convertToRadians(difference)) 
+                * Matrix4x4.CreateRotationX(convertToRadians(difference))
+                * Matrix4x4.CreateTranslation(cube);
+
+            // Matrix4x4 model = Matrix4x4.Identity * Matrix4x4.CreateRotationX(convertToRadians(-55f));
+            int modelLoc = _gl.GetUniformLocation(_program, "model");
+            _gl.UniformMatrix4(modelLoc, 1, false, (float*)&model);
+
+            _gl.DrawArrays(GLEnum.Triangles, 0, 36);
+        }
+
+    }
+
+    private static float convertToRadians(float degrees)
+    {
+        return MathF.PI / 180f * degrees;
     }
 }
