@@ -3,6 +3,8 @@ using Silk.NET.Maths;
 using Silk.NET.Windowing;
 using Silk.NET.OpenGL;
 using System.Drawing;
+using System.Numerics;
+using Silk.NET.GLFW;
 
 namespace gd.common;
 
@@ -34,6 +36,10 @@ public class Window
     {
         _window.Run();
     }
+
+    public static Vector3 Position { get; set; } = new Vector3(0, 0, 0);
+    public static float Scale { get; set; } = 0.4f;
+    public static Quaternion Rotation { get; set; } = Quaternion.CreateFromAxisAngle(Vector3.UnitZ, (float) Glfw.GetApi().GetTime());
 
     private static unsafe void setInputs()
     {
@@ -84,11 +90,15 @@ public class Window
             // Second 2 values
             layout (location = 1) in vec2 aTextureCoord;
 
+            uniform mat4 transform;
+
             // Stores and outputs the data we want to the fragment shader
             out vec2 frag_textCoords;
+
+
             void main()
             {
-                gl_Position = vec4(aPosition, 1.0);
+                gl_Position = transform * vec4(aPosition, 1.0);
                 frag_textCoords = aTextureCoord;
             }";
 
@@ -164,6 +174,15 @@ public class Window
         _gl.Clear(ClearBufferMask.ColorBufferBit);
         _gl.BindVertexArray(_vao);
         _gl.UseProgram(_program);
+
+        Matrix4x4 transformation = Matrix4x4.Identity * Matrix4x4.CreateFromQuaternion(Rotation) * Matrix4x4.CreateScale(Scale) * Matrix4x4.CreateTranslation(Position);
+        // Matrix4x4 transformation = Matrix4x4.Identity * Matrix4x4.CreateFromQuaternion(
+        //     Quaternion.CreateFromAxisAngle(Vector3.UnitZ, (float) Glfw.GetApi().GetTime())
+        // );
+
+        int transformLoc = _gl.GetUniformLocation(_program, "transform");
+        // Console.WriteLine(transformLoc);
+        _gl.UniformMatrix4(transformLoc, 1, false, (float*) &transformation);
         _gl.DrawElements(PrimitiveType.Triangles, 6, DrawElementsType.UnsignedInt, (void*)0);
     }
 }
