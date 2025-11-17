@@ -18,8 +18,6 @@ namespace gd
         private static uint _vbo; // Vertex Buffer Objects
         private static uint _ebo; // Element Buffer Objects
 
-        private static int width = 800;
-        private static int height = 600;
         private static Vector2D<int> windowSize = new Vector2D<int>(800, 600);
 
         private static ShaderDetails[] Shaders = {
@@ -28,7 +26,7 @@ namespace gd
         };
         private static engine.Shader Shader;
 
-        private static Vector3[] cubePositions = {
+        private static List<Vector3> cubePositions = new List<Vector3> {
             new Vector3( 0.0f,  0.0f,  0.0f),
             // new Vector3( 2.0f,  5.0f, -15.0f),
             // new Vector3(-1.5f, -2.2f, -2.5f),
@@ -43,6 +41,18 @@ namespace gd
 
         static void Main(String[] args)
         {
+            cubePositions = new List<Vector3>();
+            int numShapes = 1;
+            for (int i = 0; i < numShapes; i++)
+            {
+                for (int j = 0; j < numShapes; j++)
+                {
+                    cubePositions.Add(
+                        new Vector3(j, 0 , i * -1)
+                    );
+                }
+            }
+
             WindowOptions options = WindowOptions.Default with
             {
                 Size = windowSize,
@@ -112,7 +122,9 @@ namespace gd
             _gl.BindVertexArray(_vao);
             Shader.Use();
 
-            Matrix4x4 view = Matrix4x4.Identity * Matrix4x4.CreateTranslation(0.0f, 0.0f, -3.0f);
+            Matrix4x4 view = Matrix4x4.Identity 
+                // * Matrix4x4.CreateRotationX(convertToRadians(20)) 
+                * Matrix4x4.CreateTranslation(-0.5f, 0.0f, -20.0f);
             Shader.SetUniform("view", view);
 
             Matrix4x4 projection = Matrix4x4.CreatePerspectiveFieldOfView(
@@ -122,21 +134,24 @@ namespace gd
 
             var difference = (float)(Glfw.GetApi().GetTime() * 50);
 
-            for (int i = 0; i < cubePositions.Length; i++)
+            for (int i = 0; i < cubePositions.Count; i++)
             {
                 Vector3 cube = cubePositions[i];
                 // Matrix4x4 model = ;
                 float angle = 20.0f * i;
 
                 Matrix4x4 model = Matrix4x4.Identity
-                    * Matrix4x4.CreateScale(0.7f)
-                    * Matrix4x4.CreateRotationY(convertToRadians(-45))
-                    * Matrix4x4.CreateRotationX(convertToRadians(30))
+                    // * Matrix4x4.CreateScale(0.1f)
+                    // * Matrix4x4.CreateRotationY(convertToRadians(-45))
+                    // * Matrix4x4.CreateRotationX(convertToRadians(225))
+                    * Matrix4x4.CreateRotationY(convertToRadians(difference))
+                    * Matrix4x4.CreateRotationX(convertToRadians(difference))
                     * Matrix4x4.CreateTranslation(cube);
 
                 Shader.SetUniform("model", model);
 
                 _gl.DrawArrays(GLEnum.Triangles, 0, 36);
+                // _gl.DrawArrays(GLEnum.Triangles, 0, 18);
             }
         }
 
